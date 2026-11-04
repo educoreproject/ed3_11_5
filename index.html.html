@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AMA about EDUcore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#fbf8f2; --paper-2:#f0eadf; --ink:#1c1a17; --ink-soft:#5b544a; --rule:#d8cdb8; --card:#ffffff; --hl:#fde3c4;
+  --under:#e4512b; --served:#1f6fc2; --low:#e3a72f; --over:#2e9e5b; --under-bg:rgba(228,81,43,.11);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#1b1915; --paper-2:#24211c; --ink:#efe6d4; --ink-soft:#b5ab98; --rule:#4a4338; --card:#24211c; --hl:#5a4526;
+    --under:#ff7448; --served:#5ea8f2; --low:#f0bf4c; --over:#4cc47b; --under-bg:rgba(255,116,72,.13);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#1b1915; --paper-2:#24211c; --ink:#efe6d4; --ink-soft:#b5ab98; --rule:#4a4338; --card:#24211c; --hl:#5a4526;
+  --under:#ff7448; --served:#5ea8f2; --low:#f0bf4c; --over:#4cc47b; --under-bg:rgba(255,116,72,.13);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:"EB Garamond",Georgia,serif;font-size:17px;line-height:1.4}
+body{overflow-x:hidden}
+a{color:inherit}
+.wrap{max-width:1400px;margin:0 auto;padding:18px 16px 40px}
+h1{font-family:"IM Fell English",Georgia,serif;font-weight:400;font-size:clamp(26px,3.4vw,42px);margin:0;line-height:1.1}
+.sub{font-style:italic;color:var(--ink-soft);margin:6px 0 0;max-width:980px}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 4px;align-items:center}
+.btn{display:inline-block;font:inherit;font-size:16px;text-decoration:none;border:1px solid var(--ink);padding:7px 14px;border-radius:3px;background:var(--ink);color:var(--paper);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink)}
+button{font:inherit;font-size:14.5px;background:var(--card);color:var(--ink);border:1px solid var(--rule);border-radius:3px;padding:4px 10px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.status{font-size:14px;color:var(--ink-soft);font-style:italic;display:flex;align-items:center;gap:6px;margin-left:auto}
+.dot{width:9px;height:9px;border-radius:50%;background:#8a8070;display:inline-block;flex:none}
+.dot.live{background:#3f9a4a;animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(63,154,74,.55)}70%{box-shadow:0 0 0 8px rgba(63,154,74,0)}100%{box-shadow:0 0 0 0 rgba(63,154,74,0)}}
+.badge{background:#c58b22;color:#fff;font-size:12px;padding:2px 7px;border-radius:2px;font-style:normal;letter-spacing:.05em}
+.spot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:10px 0;margin:10px 0 12px;min-height:84px}
+.spot blockquote{margin:0;font-family:"IM Fell English",serif;font-size:clamp(19px,2.1vw,27px);line-height:1.25;transition:opacity .35s}
+.spot .who{display:block;font-family:"EB Garamond",serif;font-style:italic;font-size:14.5px;color:var(--ink-soft);margin-top:4px}
+.spot .ctl{display:flex;gap:6px}
+.roles{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 8px}
+.roles .lab{font-size:14px;color:var(--ink-soft);font-style:italic;margin-right:4px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start}
+@media (max-width:1050px){.grid{grid-template-columns:1fr}}
+svg{display:block;width:100%;height:auto}
+.ax{stroke:var(--ink-soft);stroke-width:.8}
+.mid{stroke:var(--ink-soft);stroke-width:.8;stroke-dasharray:3 4}
+.tick{font-family:"IM Fell English",serif;font-size:13px;fill:var(--ink-soft)}
+.axl{font-family:"IM Fell English",serif;font-size:16px;fill:var(--ink)}
+.ql{font-family:"IM Fell English",serif;font-size:15px;font-style:italic}
+.qs{font-family:"EB Garamond",serif;font-size:12.5px;font-style:italic;fill:var(--ink-soft)}
+.bub{cursor:pointer;transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.bub circle{transition:r .9s cubic-bezier(.2,.8,.2,1),opacity .3s;stroke:var(--paper);stroke-width:1.5}
+.bub.est circle{stroke:var(--ink);stroke-dasharray:3 3;stroke-width:1.2}
+.bub.sel circle{stroke:var(--ink);stroke-width:2.5;stroke-dasharray:none}
+.bub.new circle{animation:pop 1.6s ease-out}
+@keyframes pop{0%{filter:drop-shadow(0 0 10px var(--under))}100%{filter:none}}
+.bl{font-family:"EB Garamond",serif;font-size:13px;fill:var(--ink);pointer-events:none;paint-order:stroke;stroke:var(--paper);stroke-width:3px;stroke-linejoin:round}
+.bn{font-family:"IM Fell English",serif;font-size:13px;fill:#fff;pointer-events:none}
+.key{display:flex;gap:14px;flex-wrap:wrap;font-size:13.5px;color:var(--ink-soft);margin:6px 0 0}
+.key span{display:inline-flex;align-items:center;gap:6px}
+aside section{background:var(--card);border:1px solid var(--rule);padding:12px 14px;margin-bottom:14px}
+aside h2{font-family:"IM Fell English",serif;font-weight:400;font-size:20px;margin:0 0 8px;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.prompt{margin:10px 0;padding-left:12px;border-left:3px solid var(--under);font-size:16px}
+.prompt small{display:block;color:var(--ink-soft);font-style:italic;font-size:13px}
+.empty{color:var(--ink-soft);font-style:italic;font-size:15px}
+.rk{display:grid;grid-template-columns:22px 1fr auto;gap:2px 8px;align-items:baseline;font-size:15px;padding:4px;cursor:pointer}
+.rk.on{background:var(--hl)}
+.rk .n{font-family:"IM Fell English",serif;color:var(--ink-soft)}
+.rk .meta{grid-column:2/4;font-size:12.5px;color:var(--ink-soft);font-style:italic}
+.rk .bar{grid-column:2/4;height:5px;background:var(--paper-2);position:relative}
+.rk .bar i{position:absolute;inset:0 auto 0 0;background:var(--under)}
+.std{display:grid;grid-template-columns:110px 1fr 24px;gap:8px;align-items:center;font-size:14.5px;margin:3px 0}
+.std .b{height:8px;background:var(--paper-2);position:relative}.std .b i{position:absolute;inset:0 auto 0 0;background:var(--ink)}
+.quote{border-left:3px solid var(--rule);padding:4px 0 4px 10px;margin:8px 0;font-size:15.5px}
+.quote .meta{font-size:13px;color:var(--ink-soft);font-style:italic}
+.quote.flash{animation:flash 2.5s}@keyframes flash{0%{background:var(--hl)}100%{background:transparent}}
+.feed{max-height:420px;overflow:auto}
+.card{position:fixed;z-index:20;max-width:360px;background:var(--card);border:1px solid var(--ink-soft);padding:10px 12px;box-shadow:0 6px 24px rgba(0,0,0,.18);font-size:15px;display:none}
+.card h3{font-family:"IM Fell English",serif;font-weight:400;margin:0 0 4px;font-size:19px}
+.card .meta{font-size:13px;color:var(--ink-soft);font-style:italic}
+.card p{margin:5px 0}
+footer{font-size:13px;color:var(--ink-soft);margin-top:14px;font-style:italic}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>AMA about EDUcore</h1>
+  <p class="sub">Each bubble is a need raised during the r/Ed3 AMA. Higher means more people say it matters; further left means it's poorly served today. Bubble size is how many people raised it. The top-left corner is where EDUcore should build.</p>
+</header>
+<div class="cta">
+  <a class="btn" id="formBtn" href="#" target="_blank" rel="noopener" hidden>Add what you need · 2 min</a>
+  <a class="btn ghost" href="https://www.reddit.com/r/Ed3/" target="_blank" rel="noopener">Join the AMA on r/Ed3</a>
+  <span class="status"><span class="dot" id="dot"></span><span id="statusText">Starting…</span></span>
+  <button id="themeBtn" title="Switch light / dark">Dark mode</button>
+</div>
+
+<div class="spot" aria-live="polite">
+  <blockquote id="spotQ"><span class="empty">Needs from the AMA will appear here.</span></blockquote>
+  <div class="ctl"><button id="spPrev" aria-label="Previous">‹</button><button id="spPause" aria-label="Pause rotation" aria-pressed="false">❚❚</button><button id="spNext" aria-label="Next">›</button></div>
+</div>
+
+<div class="grid">
+  <div>
+    <div class="roles" id="roles"></div>
+    <svg id="map" viewBox="0 0 760 640" role="img" aria-label="Opportunity map: importance versus how well served, one bubble per need"></svg>
+    <div class="key">
+      <span><i class="dot" style="background:var(--under)"></i>Underserved: build here</span>
+      <span><i class="dot" style="background:var(--served)"></i>Served: don't break it</span>
+      <span><i class="dot" style="background:var(--over)"></i>Overserved</span>
+      <span><i class="dot" style="background:var(--low)"></i>Lower priority</span>
+      <span><i class="dot" style="background:transparent;border:1.2px dashed var(--ink)"></i>includes Claude-estimated comments</span>
+      <span style="font-style:italic">Number = rank in the Opportunity ranking · size = how many people raised it</span>
+    </div>
+  </div>
+  <aside>
+    <section><h2>What to ask the room</h2><div id="prompts"><p class="empty">Prompts appear once a few needs are in.</p></div></section>
+    <section><h2>Opportunity ranking</h2><div id="rank"><p class="empty">Waiting for responses…</p></div>
+      <p style="font-size:12.5px;color:var(--ink-soft);font-style:italic;margin:8px 0 0">Score = importance + the gap between importance and how well it's served (0–20).</p></section>
+    <section><h2>Standards people named</h2><div id="stds"><p class="empty">None yet.</p></div></section>
+    <section><h2>Voices</h2><div class="feed" id="feed"></div></section>
+  </aside>
+</div>
+<footer>Needs are grouped into themes by keyword, a first pass that can be overridden with a "Theme" column in the sheet. Dashed bubbles include needs Claude pulled from Reddit comments and scored by estimate; solid ones come only from people's own ratings. Method after Ulwick's opportunity scoring (importance vs. satisfaction).</footer>
+</div>
+<div class="card" id="card"></div>
+
+<script>
+(()=>{
+"use strict";
+/* ========= SETUP: fill these in once the Form exists ========= */
+const SHEET_ID="";      // response sheet ID (share it "Anyone with the link → Viewer")
+const FORM_TAB="";      // blank = first tab, where Google Forms writes responses
+const REDDIT_TAB="Reddit"; // optional tab of Claude-scored Reddit comments (needs a "source" column)
+const FORM_URL="";      // public link to the Google Form (shows the "Add what you need" button)
+const POLL_MS=15000;
+/* ============================================================= */
+
+const NS="http://www.w3.org/2000/svg",$=s=>document.querySelector(s);
+function el(t,a={},p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+function tx(p,x,y,s,c,a={}){const t=el("text",{x,y,class:c,...a},p);t.textContent=s;return t}
+const H=t=>document.createElement(t);
+
+/* ---- need themes (keyword first pass; a "Theme" column overrides) ---- */
+const THEMES=[
+ ["crosswalk","Crosswalks between standards",["crosswalk","map","map between","mapping","mappings","maps to","translate","translation","align standards","interoperab","harmoniz","ed-fi to ceds","between standards","between ed-fi","semantic"]],
+ ["records","Portable learner records",["transcript","learner record","clr","ler","wallet","portable","verifiable","credential","badge","diploma"]],
+ ["skills","Skills & competency alignment",["skill","competenc","case framework","ctdl","rsd","framework","outcome","learning objective","standards alignment"]],
+ ["transfer","Credit transfer & dual credit",["transfer","dual credit","dual enrollment","articulation","prior learning","pla","course equivalen","credit for"]],
+ ["workforce","Education-to-workforce signals",["workforce","employer","job","occupation","soc code","hiring","labor market","jedx","hr open","career"]],
+ ["ai","AI & agent access (MCP)",["ai","llm","agent","mcp","claude","chatgpt","copilot","prompt","rag","model"]],
+ ["discovery","Find the right element or definition",["search","find","definition","define","lookup","look up","dictionary","glossary","which element","what field","element"]],
+ ["quality","Data quality & validation",["validat","data quality","clean","error","conform","conformance","test data","integrity"]],
+ ["governance","Versioning & governance",["version","governance","changelog","change log","deprecat","release","steward","breaking change","upgrade"]],
+ ["onboarding","Docs, examples & onboarding",["documentation","docs","example","tutorial","onboard","getting started","sample","how to","training"]],
+ ["privacy","Privacy, consent & access",["privacy","ferpa","consent","security","access control","identity","permission"]],
+ ["reporting","State & federal reporting",["reporting","edfacts","state report","compliance","accountability","sedm","federal"]]
+].map(([id,name,kw])=>({id,name,re:kw.map(k=>new RegExp("(^|[^a-z])"+k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+(k.length<=3?"($|[^a-z])":""),"i"))}));
+const tByName=n=>{const l=(n||"").trim().toLowerCase();if(!l)return null;return THEMES.find(t=>t.id===l||t.name.toLowerCase()===l)||THEMES.find(t=>t.name.toLowerCase().includes(l))||null};
+let custom={};
+function themeOf(text,override){
+  if(override&&override.trim()){const t=tByName(override);if(t)return t.id;const id="c_"+override.trim().toLowerCase().replace(/\W+/g,"_");custom[id]=override.trim();return id}
+  let best=null,bs=0;THEMES.forEach(t=>{const s=t.re.filter(r=>r.test(text)).length;if(s>bs){bs=s;best=t.id}});return best||"other"}
+const themeName=id=>id==="other"?"Other (not yet themed)":custom[id]||(THEMES.find(t=>t.id===id)||{}).name||id;
+
+const STDS=[["Ed-Fi",/ed-?fi/i],["CEDS",/\bceds\b/i],["CASE",/\bcase\b/i],["CTDL",/ctdl|credential engine/i],["PESC",/\bpesc\b/i],["SIF",/\bsif\b|a4l/i],["1EdTech",/1edtech|ims global|oneroster|\bclr\b|open badges|\blti\b/i],["HR Open / JEDx",/hr open|jedx/i],["SEDM",/sedm/i],["CIP / SOC",/\bcip\b|\bsoc\b|o\*?net/i],["LIF",/\blif\b/i]];
+
+/* ---- state ---- */
+let rows=[],seen=new Set(),first=true,role="",sel=null,pollT=null,demoT=null;
+
+/* ---- reading the sheet (JSONP: works from GitHub Pages or a local file) ---- */
+let jn=0;
+function sheetRows(id,tab){return new Promise((res,rej)=>{
+  const cb="__oppcb"+(++jn),sc=H("script"),done=()=>{delete window[cb];sc.remove();clearTimeout(to)};
+  const to=setTimeout(()=>{done();rej(new Error("timed out"))},12000);
+  window[cb]=r=>{done();if(!r||r.status==="error"){rej(new Error("sheet error"));return}
+    const t=r.table,h=t.cols.map(c=>c.label||"");
+    res([h,...(t.rows||[]).map(x=>t.cols.map((c,i)=>{const v=x.c&&x.c[i];return v?String(v.f!=null?v.f:(v.v==null?"":v.v)):""}))])};
+  sc.onerror=()=>{done();rej(new Error("couldn't load sheet; is it shared 'Anyone with the link'?"))};
+  sc.src=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json;responseHandler:${cb}&headers=1${tab?"&sheet="+encodeURIComponent(tab):""}&_t=${Date.now()}`;
+  document.head.appendChild(sc)})}
+function parseTime(s){const m=(s||"").match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+):?(\d+)?/);if(m)return new Date(+m[3],m[1]-1,+m[2],+m[4],+m[5],+(m[6]||0));const d=new Date(s);return isNaN(d)?null:d}
+const score=v=>{const m=String(v||"").match(/[1-5]/);return m?+m[0]:null};
+
+function normalize(table,source){
+  if(!table||table.length<1)return[];
+  const h=table[0].map(x=>x.trim().toLowerCase());const f=re=>h.findIndex(x=>re.test(x));
+  const C={ts:f(/timestamp/),need:f(/what do you need|need educore|what should educore|^need$|need\b/),imp:f(/important|importance/),
+    sat:f(/well (is it )?(served|handled|met)|served today|today|satisf|^served$/),role:f(/role|who are you|describe/),
+    std:f(/standard/),more:f(/anything else|why|example|context|tell us more/),theme:f(/^theme$/),src:f(/^source$|link/)};
+  if(source==="reddit"&&C.src<0)return[];                       // guard: tab missing → gviz may hand back the first tab
+  if(C.need<0){const longest=h.findIndex((x,i)=>i!==C.ts&&!/email|name|score/.test(x));C.need=longest}
+  return table.slice(1).map((r,i)=>{const need=(r[C.need]||"").trim();if(!need)return null;
+    const more=C.more>=0?(r[C.more]||"").trim():"";const stdText=(C.std>=0?r[C.std]:"")+" "+need+" "+more;
+    return{key:source+"|"+(r[C.ts]||"")+"|"+i+"|"+need.slice(0,30),src:source,t:parseTime(r[C.ts]),need,more,
+      imp:score(r[C.imp]),sat:score(r[C.sat]),role:C.role>=0?(r[C.role]||"").trim()||"Unspecified":"Unspecified",
+      stds:STDS.filter(([,re])=>re.test(stdText)).map(([n])=>n),link:C.src>=0?(r[C.src]||"").trim():"",
+      theme:themeOf(need+" "+more,C.theme>=0?r[C.theme]:"")}}).filter(Boolean)}
+
+function ingest(formTable,redditTable){
+  custom={};const all=[...normalize(formTable,"form"),...normalize(redditTable,"reddit")];
+  const fresh=all.filter(r=>!seen.has(r.key));fresh.forEach(r=>seen.add(r.key));
+  if(first){fresh.length=0;first=false}
+  rows=all;fresh.forEach(r=>{if(r.need.length>8)spot.unshift(r)});
+  render(new Set(fresh.map(r=>r.theme)));if(fresh.length){si=0;showSpot()}}
+
+/* ---- aggregation ---- */
+const mean=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+function agg(list){const by={};list.forEach(r=>{(by[r.theme]=by[r.theme]||[]).push(r)});
+  return Object.entries(by).map(([id,rs])=>{const ims=rs.map(r=>r.imp).filter(v=>v!=null),sts=rs.map(r=>r.sat).filter(v=>v!=null);
+    const imp=mean(ims),sat=mean(sts);const i10=imp==null?null:(imp-1)*2.5,s10=sat==null?null:(sat-1)*2.5;
+    const opp=i10==null||s10==null?null:i10+Math.max(i10-s10,0);
+    const roles={};rs.forEach(r=>roles[r.role]=(roles[r.role]||0)+1);
+    return{id,name:themeName(id),rs,n:rs.length,imp,sat,opp,est:rs.some(r=>r.src==="reddit"),
+      spread:ims.length>1?Math.max(...ims)-Math.min(...ims):0,roles}}).filter(g=>g.imp!=null&&g.sat!=null)}
+function quad(g){return g.imp>=3?(g.sat<3?"under":"served"):(g.sat<3?"low":"over")}
+
+/* ---- chart ---- */
+const map=$("#map");let X0=80,X1=735,Y0=34,Y1=574,narrow=false;
+function dims(){narrow=innerWidth<640;if(narrow){X0=52;X1=470;Y0=30;Y1=470;map.setAttribute("viewBox","0 0 480 540")}else{X0=80;X1=735;Y0=34;Y1=574;map.setAttribute("viewBox","0 0 760 640")}}
+const sxx=v=>X0+(v-0.5)/5*(X1-X0);                // x = how well served (1 left → 5 right), padded
+const sy=v=>Y1-(v-0.5)/5*(Y1-Y0);                 // y = importance (1 bottom → 5 top), padded
+let gBub=null,gLead=null;
+function frame(){
+  dims();map.innerHTML="";const mx=sxx(3),my=sy(3);
+  el("rect",{x:X0,y:Y0,width:mx-X0,height:my-Y0,fill:"var(--under-bg)"},map);gLead=el("g",{},map);
+  el("line",{x1:X0,y1:Y1,x2:X1,y2:Y1,class:"ax"},map);el("line",{x1:X0,y1:Y0,x2:X0,y2:Y1,class:"ax"},map);
+  el("line",{x1:mx,y1:Y0,x2:mx,y2:Y1,class:"mid"},map);el("line",{x1:X0,y1:my,x2:X1,y2:my,class:"mid"},map);
+  [1,2,3,4,5].forEach(v=>{tx(map,sxx(v),Y1+18,v,"tick",{"text-anchor":"middle"});tx(map,X0-10,sy(v)+4,v,"tick",{"text-anchor":"end"})});
+  tx(map,(X0+X1)/2,Y1+44,narrow?"How well served today? →":"How well is it served today?  →  well served","axl",{"text-anchor":"middle"});
+  tx(map,X0,Y1+44,"poorly","tick");
+  tx(map,22,(Y0+Y1)/2,"How important is it?  →","axl",{"text-anchor":"middle",transform:`rotate(-90 22 ${(Y0+Y1)/2})`});
+  const q=(x,y,a,t,s,c)=>{tx(map,x,y,t,"ql",{"text-anchor":a,fill:c});tx(map,x,y+16,s,"qs",{"text-anchor":a})};
+  q(X0+10,Y0+20,"start","Underserved",narrow?"build here":"important, poorly served: build here","var(--under)");
+  q(X1-10,Y0+20,"end","Served",narrow?"don't break it":"important and handled: don't break it","var(--served)");
+  q(X0+10,Y1-26,"start","Lower priority",narrow?"":"less important, poorly served","var(--ink-soft)");
+  q(X1-10,Y1-26,"end","Overserved",narrow?"":"handled better than it needs to be","var(--over)");
+  gBub=el("g",{},map)}
+const nodes={};
+function renderMap(groups,fresh){
+  if(!gBub)frame();
+  const live=new Set(groups.map(g=>g.id));
+  Object.keys(nodes).forEach(id=>{if(!live.has(id)){nodes[id].remove();delete nodes[id]}});
+  if(!groups.length){if(!$("#emptyMsg")){const t=tx(gBub,(X0+X1)/2,(Y0+Y1)/2,"Bubbles appear as needs come in.","ql",{"text-anchor":"middle",id:"emptyMsg",fill:"var(--ink-soft)"})}return}
+  $("#emptyMsg")?.remove();
+  // keep bubbles from sitting on top of each other: nudge apart, then draw a thin line back to the true point
+  const L=groups.map(g=>({g,r:Math.min(narrow?34:46,(narrow?8:9)+(narrow?5.5:7)*Math.sqrt(g.n)),tx:sxx(g.sat),ty:sy(g.imp),x:sxx(g.sat),y:sy(g.imp)}));
+  L.forEach((a,i)=>{a.x+=Math.cos(i*2.4)*.5;a.y+=Math.sin(i*2.4)*.5});
+  for(let it=0;it<120;it++){for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++){const a=L[i],b=L[j];
+      let dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||.01;const need=a.r+b.r+18;if(d<need){const m=(need-d)/2;dx/=d;dy/=d;a.x-=dx*m;a.y-=dy*m;b.x+=dx*m;b.y+=dy*m}}
+    L.forEach(a=>{a.x+=(a.tx-a.x)*.02;a.y+=(a.ty-a.y)*.02;a.x=Math.max(X0+a.r,Math.min(X1-a.r,a.x));a.y=Math.max(Y0+a.r,Math.min(Y1-a.r-16,a.y))})}
+  const pos={};L.forEach(a=>pos[a.g.id]=a);
+  const rankOf={};groups.slice().sort((a,b)=>b.opp-a.opp).forEach((g,i)=>rankOf[g.id]=i+1);
+  // label greedily in rank order; skip a label rather than let it collide (hover or the ranking shows it)
+  const qw=narrow?115:250,boxes=[{x1:X0,x2:X0+qw,y1:Y0,y2:Y0+42},{x1:X1-qw,x2:X1,y1:Y0,y2:Y0+42},{x1:X0,x2:X0+qw,y1:Y1-44,y2:Y1},{x1:X1-qw,x2:X1,y1:Y1-44,y2:Y1}],hit=(b)=>boxes.some(o=>b.x1<o.x2&&b.x2>o.x1&&b.y1<o.y2&&b.y2>o.y1)||L.some(c=>c!==b.own&&b.x1<c.x+c.r&&b.x2>c.x-c.r&&b.y1<c.y+c.r&&b.y2>c.y-c.r);
+  const labelY={};L.slice().sort((a,b)=>rankOf[a.g.id]-rankOf[b.g.id]).forEach(a=>{const w=a.g.name.length*6.4,h=15;
+    for(const dy of [a.r+15,-(a.r+6)]){const b={x1:a.x-w/2,x2:a.x+w/2,y1:a.y+dy-12,y2:a.y+dy+3,own:a};if(b.x1<X0-60||b.x2>X1+20)continue;if(!hit(b)){boxes.push(b);labelY[a.g.id]=dy;return}}
+    labelY[a.g.id]=null});
+  gLead.innerHTML="";L.forEach(a=>{if(Math.hypot(a.x-a.tx,a.y-a.ty)>a.r*.6){el("line",{x1:a.tx,y1:a.ty,x2:a.x,y2:a.y,stroke:"var(--ink-soft)","stroke-width":.7,"stroke-dasharray":"2 2"},gLead);el("circle",{cx:a.tx,cy:a.ty,r:2.2,fill:"var(--ink-soft)"},gLead)}});
+  groups.slice().sort((a,b)=>b.n-a.n).forEach(g=>{
+    const r=pos[g.id].r,x=pos[g.id].x,y=pos[g.id].y;let n=nodes[g.id];
+    if(!n){n=el("g",{class:"bub",tabindex:0},gBub);el("circle",{r:0,cx:0,cy:0},n);tx(n,0,4.5,"","bn",{"text-anchor":"middle"});tx(n,0,0,"","bl",{"text-anchor":"middle"});
+      n.style.transform=`translate(${x}px,${y}px)`;nodes[g.id]=n;
+      n.addEventListener("mouseenter",e=>card(e,nodes[g.id]._g));n.addEventListener("mousemove",e=>place(e));n.addEventListener("mouseleave",hide);
+      n.addEventListener("click",e=>{e.stopPropagation();sel=sel===g.id?null:g.id;card(e,nodes[g.id]._g);render();refreshSpot()});
+      n.addEventListener("keydown",e=>{if(e.key==="Enter"){sel=sel===g.id?null:g.id;render();refreshSpot()}})}
+    n._g=g;gBub.appendChild(n);
+    requestAnimationFrame(()=>{n.style.transform=`translate(${x}px,${y}px)`});
+    const c=n.querySelector("circle");c.setAttribute("r",r);c.setAttribute("fill",`var(--${quad(g)})`);c.style.opacity=sel&&sel!==g.id?.3:1;
+    n.querySelector(".bn").textContent=rankOf[g.id];
+    const lb=n.querySelector(".bl");lb.textContent=labelY[g.id]==null&&sel!==g.id?"":g.name;lb.setAttribute("y",labelY[g.id]==null?r+15:labelY[g.id]);lb.style.opacity=sel&&sel!==g.id?.35:1;
+    n.setAttribute("class","bub"+(g.est?" est":"")+(sel===g.id?" sel":"")+(fresh&&fresh.has(g.id)?" new":""));
+    n.setAttribute("aria-label",`${g.name}: ${g.n} people, importance ${g.imp.toFixed(1)}, served ${g.sat.toFixed(1)}`)})}
+function card(e,g){const c=$("#card");c.innerHTML="";
+  const h=H("h3");h.textContent=g.name;const m=H("div");m.className="meta";
+  m.textContent=`${g.n} ${g.n===1?"person":"people"} · importance ${g.imp.toFixed(1)} · served ${g.sat.toFixed(1)} · score ${g.opp.toFixed(1)}`;c.append(h,m);
+  const rl=H("div");rl.className="meta";rl.textContent="Who: "+Object.entries(g.roles).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k} (${v})`).join(", ");c.appendChild(rl);
+  g.rs.slice(-3).reverse().forEach(r=>{const p=H("p");p.textContent="“"+r.need+"”"+(r.src==="reddit"?" (Reddit, Claude-scored)":"");c.appendChild(p)});
+  c.style.display="block";place(e)}
+function place(e){const c=$("#card");if(c.style.display!=="block")return;const x=Math.min((e.clientX||innerWidth/2)+16,innerWidth-c.offsetWidth-10),y=Math.min((e.clientY||innerHeight/2)+16,innerHeight-c.offsetHeight-10);c.style.left=Math.max(8,x)+"px";c.style.top=Math.max(8,y)+"px"}
+function hide(){$("#card").style.display="none"}
+document.addEventListener("click",hide);
+
+/* ---- panels ---- */
+function filtered(){return role?rows.filter(r=>r.role===role):rows}
+function renderRoles(){const box=$("#roles");box.innerHTML="";const cnt={};rows.forEach(r=>cnt[r.role]=(cnt[r.role]||0)+1);
+  const keys=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]);if(keys.length<2){box.hidden=true;return}box.hidden=false;
+  const l=H("span");l.className="lab";l.textContent="See it through the eyes of:";box.appendChild(l);
+  const mk=(k,lab)=>{const b=H("button");b.textContent=lab;b.setAttribute("aria-pressed",role===k);b.onclick=()=>{role=k;render()};box.appendChild(b)};
+  mk("","Everyone ("+rows.length+")");keys.forEach(k=>mk(k,`${k} (${cnt[k]})`))}
+function renderRank(groups){const box=$("#rank");box.innerHTML="";
+  if(!groups.length){box.innerHTML='<p class="empty">Waiting for responses…</p>';return}
+  groups.slice().sort((a,b)=>b.opp-a.opp).forEach((g,i)=>{const d=H("div");d.className="rk"+(sel===g.id?" on":"");d.tabIndex=0;
+    const n=H("span");n.className="n";n.textContent=i+1;const a=H("span");a.textContent=g.name;const s=H("span");s.textContent=g.opp.toFixed(1);
+    const bar=H("div");bar.className="bar";const b=H("i");b.style.width=(g.opp/20*100)+"%";bar.appendChild(b);
+    const m=H("div");m.className="meta";m.textContent=`${g.n} · matters ${g.imp.toFixed(1)} · served ${g.sat.toFixed(1)}${g.est?" · incl. Reddit estimates":""}`;
+    d.append(n,a,s,bar,m);d.onclick=()=>{sel=sel===g.id?null:g.id;render();refreshSpot()};d.onkeydown=e=>{if(e.key==="Enter")d.onclick()};box.appendChild(d)})}
+function renderStds(list){const box=$("#stds");box.innerHTML="";const c={};list.forEach(r=>r.stds.forEach(s=>c[s]=(c[s]||0)+1));
+  const e=Object.entries(c).sort((a,b)=>b[1]-a[1]);if(!e.length){box.innerHTML='<p class="empty">None yet.</p>';return}const mx=e[0][1];
+  e.forEach(([k,v])=>{const d=H("div");d.className="std";const a=H("span");a.textContent=k;const b=H("span");b.className="b";const i=H("i");i.style.width=(v/mx*100)+"%";b.appendChild(i);const n=H("span");n.textContent=v;d.append(a,b,n);box.appendChild(d)})}
+function renderFeed(list,fresh){const box=$("#feed");box.innerHTML="";let l=list.slice().reverse();if(sel)l=l.filter(r=>r.theme===sel);
+  if(sel){const p=H("p");p.className="empty";p.textContent=`Showing “${themeName(sel)}”. Click the bubble again to clear.`;box.appendChild(p)}
+  if(!l.length){const p=H("p");p.className="empty";p.textContent="No needs yet.";box.appendChild(p);return}
+  l.slice(0,100).forEach(r=>{const d=H("div");d.className="quote"+(fresh&&fresh.has(r.theme)&&!seenFeed.has(r.key)?" flash":"");seenFeed.add(r.key);
+    d.style.borderLeftColor=`var(--${(()=>{const g=agg([r])[0];return g?quad(g):"low"})()})`;
+    const t=H("div");t.textContent=r.need+(r.more?" — "+r.more:"");const m=H("div");m.className="meta";
+    m.textContent=`${r.role} · ${themeName(r.theme)}${r.imp?` · matters ${r.imp}/5, served ${r.sat}/5`:""}${r.src==="reddit"?" · Reddit, Claude-scored":""}`;
+    d.append(t,m);if(r.link&&/^https:\/\/(www\.|old\.)?reddit\.com\//.test(r.link)){const a=H("a");a.href=r.link;a.target="_blank";a.rel="noopener";a.textContent=" ↗ comment";a.style.fontSize="13px";m.appendChild(a)}
+    box.appendChild(d)})}
+let seenFeed=new Set();
+
+/* ---- discussion prompts (rule-based) ---- */
+function renderPrompts(groups,list){const box=$("#prompts");box.innerHTML="";
+  if(list.length<3||!groups.length){box.innerHTML='<p class="empty">Prompts appear once a few needs are in.</p>';return}
+  const P=[],used=new Set(),add=(id,t,w)=>{if(P.length>=4||used.has(id+w))return;used.add(id+w);P.push([t,w])};
+  const top=groups.slice().sort((a,b)=>b.opp-a.opp)[0];
+  if(top)add(top.id,`The biggest gap so far is “${top.name}”: it matters ${top.imp.toFixed(1)}/5 but is served ${top.sat.toFixed(1)}/5 today. What are you doing as a workaround right now?`,"Highest opportunity score");
+  const most=groups.slice().sort((a,b)=>b.n-a.n)[0];
+  if(most&&most.id!==top.id&&most.n>=2)add(most.id,`${most.n} people raised “${most.name}”, more than anything else. What would “done” look like for you?`,"Raised most often");
+  if(!role){const roles=[...new Set(list.map(r=>r.role))];let best=null;
+    groups.forEach(g=>{const byR={};g.rs.forEach(r=>{if(r.imp!=null)(byR[r.role]=byR[r.role]||[]).push(r.imp)});
+      const e=Object.entries(byR).filter(([,v])=>v.length>=2).map(([k,v])=>[k,mean(v)]);if(e.length<2)return;
+      e.sort((a,b)=>b[1]-a[1]);const d=e[0][1]-e[e.length-1][1];if(d>=1.5&&(!best||d>best.d))best={g,d,hi:e[0],lo:e[e.length-1]}});
+    if(best)add(best.g.id,`${best.hi[0]} rate “${best.g.name}” ${best.hi[1].toFixed(1)}/5; ${best.lo[0]} rate it ${best.lo[1].toFixed(1)}. What does one group see that the other doesn't?`,"Biggest split by role")}
+  const split=groups.filter(g=>g.n>=3&&g.spread>=3).sort((a,b)=>b.spread-a.spread)[0];
+  if(split)add(split.id,`People disagree on “${split.name}”: importance scores run from 1 to 5. Who thinks it doesn't matter, and why?`,"Most disagreement");
+  const over=groups.filter(g=>quad(g)==="served"||quad(g)==="over").sort((a,b)=>b.sat-a.sat)[0];
+  if(over)add(over.id,`“${over.name}” looks well served already (${over.sat.toFixed(1)}/5). What's working there that EDUcore should plug into rather than rebuild?`,"Already handled");
+  P.forEach(([t,w])=>{const d=H("div");d.className="prompt";d.textContent=t;const s=H("small");s.textContent=w;d.appendChild(s);box.appendChild(d)})}
+
+/* ---- spotlight ---- */
+let spot=[],si=0,paused=false,spT=null;
+function refreshSpot(){spot=filtered().filter(r=>r.need.length>8&&(!sel||r.theme===sel)).reverse();si=0;showSpot()}
+function showSpot(){const q=$("#spotQ");clearTimeout(spT);if(!spot.length){q.innerHTML='<span class="empty">Needs from the AMA will appear here.</span>';return}
+  si=((si%spot.length)+spot.length)%spot.length;const r=spot[si];q.style.opacity=0;
+  setTimeout(()=>{q.innerHTML="";q.appendChild(document.createTextNode("“"+r.need+"”"));const w=H("span");w.className="who";
+    w.textContent=`${r.role} · ${themeName(r.theme)}${r.src==="reddit"?" · from a Reddit comment":""}`;q.appendChild(w);q.style.opacity=1},250);
+  if(!paused)spT=setTimeout(()=>{si++;showSpot()},9000)}
+$("#spPrev").onclick=()=>{si--;showSpot()};$("#spNext").onclick=()=>{si++;showSpot()};
+$("#spPause").onclick=e=>{paused=!paused;e.currentTarget.setAttribute("aria-pressed",paused);e.currentTarget.textContent=paused?"▶":"❚❚";showSpot()};
+
+function render(fresh){const list=filtered(),groups=agg(list);renderRoles();renderMap(groups,fresh);renderRank(groups);renderStds(list);renderFeed(list,fresh);renderPrompts(groups,list)}
+
+/* ---- status & polling ---- */
+function status(k,m){$("#dot").className="dot "+k;const s=$("#statusText");s.innerHTML="";if(k==="demo"){const b=H("span");b.className="badge";b.textContent="SAMPLE DATA";s.append(b," ")}s.append(document.createTextNode(m))}
+async function poll(){
+  const id=new URLSearchParams(location.search).get("sheet")||SHEET_ID;
+  try{const f=await sheetRows(id,FORM_TAB);let rd=null;if(REDDIT_TAB){try{rd=await sheetRows(id,REDDIT_TAB)}catch(e){}}
+    const wasFirst=first;ingest(f,rd);if(wasFirst)refreshSpot();
+    status("live",`Live · ${rows.length} need${rows.length===1?"":"s"} · updated ${new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit",second:"2-digit"})}`)}
+  catch(e){if(!rows.length){clearInterval(pollT);demo(e.message)}else status("",`Reconnecting… (${e.message})`)}}
+
+/* ---- sample data (no sheet yet, or ?demo) ---- */
+const DH=["Timestamp","What do you need EDUcore to do?","How important is this to you?","How well is it handled today, by any tool or standard?","Which best describes you?","Which standards does it touch?","Anything else?"];
+const DEMO=[
+ ["Map our Ed-Fi data to CEDS so state reporting stops being a manual crosswalk","5","1","District / school data","Ed-Fi, CEDS",""],
+ ["Let an AI agent look up what a standard element actually means","4","2","Vendor / developer","CEDS, Ed-Fi","We're building with MCP already"],
+ ["Show which dual credit courses transfer to which colleges","5","1","Postsecondary / registrar","PESC","Students lose credits every term"],
+ ["Align our competency framework to CTDL and CASE","4","2","Workforce / employer","CTDL, CASE",""],
+ ["Crosswalk between Ed-Fi and OneRoster for rostering","4","3","Vendor / developer","Ed-Fi, 1EdTech",""],
+ ["A portable learner record students actually own","5","2","Learner / family","1EdTech (CLR, Open Badges)",""],
+ ["Clear docs and examples for getting started","3","2","Vendor / developer","",""],
+ ["Versioning so I know when a mapping changes","3","1","State agency","CEDS",""],
+ ["Map Ed-Fi to CEDS for our state data warehouse","5","2","State agency","Ed-Fi, CEDS",""],
+ ["Connect course outcomes to occupations (SOC codes)","4","2","Workforce / employer","CTDL, CIP / SOC",""],
+ ["Search for the right element across all the standards at once","4","2","Researcher","CEDS, SIF, Ed-Fi",""],
+ ["Transcript exchange between high school and college","4","3","Postsecondary / registrar","PESC",""],
+ ["FERPA-safe consent for sharing records with employers","3","3","District / school data","",""],
+ ["Ed-Fi to CEDS mapping we can trust for EDFacts","4","2","District / school data","Ed-Fi, CEDS",""],
+ ["Validation that our data conforms before we submit","3","4","State agency","Ed-Fi",""],
+ ["Use Claude or ChatGPT to answer 'which field holds this?'","3","2","District / school data","",""],
+ ["Basic rostering between our SIS and LMS","4","4","District / school data","1EdTech (OneRoster)","OneRoster mostly works"],
+ ["Another place to publish course catalog data","2","4","Postsecondary / registrar","PESC",""],
+ ["Clear governance and versioning for who approves changes","2","2","Standards body","CEDS","Matters later, not now"]
+];
+const DR=[["need","importance","served","role","theme","source"],
+ ["Prior learning should count toward a credential","4","1","Learner / family","Credit transfer & dual credit","https://www.reddit.com/r/Ed3/"],
+ ["Nobody can tell me how CASE and CTDL relate","4","2","Researcher","Crosswalks between standards","https://www.reddit.com/r/Ed3/"],
+ ["We need SIF to Ed-Fi migration help","3","2","Vendor / developer","Crosswalks between standards","https://www.reddit.com/r/Ed3/"]];
+function demo(why){clearTimeout(demoT);let i=6,j=1;const base=Date.now()-12*60000;
+  const fmt=t=>`${t.getMonth()+1}/${t.getDate()}/${t.getFullYear()} ${t.getHours()}:${t.getMinutes()}:00`;
+  const tab=k=>[DH,...DEMO.slice(0,k).map((d,n)=>[fmt(new Date(base+n*45000)),...d])];
+  seen=new Set();first=true;ingest(tab(i),DR.slice(0,1+j));refreshSpot();
+  status("demo",why&&SHEET_ID?`Couldn't read the sheet (${why}). Showing sample needs.`:"Showing sample needs until the Form is connected");
+  const step=()=>{if(i>=DEMO.length&&j>=DR.length-1)return;if(i<DEMO.length)i++;else j++;ingest(tab(i),DR.slice(0,1+j));demoT=setTimeout(step,5000)};demoT=setTimeout(step,4000)}
+
+{const b=$("#themeBtn"),root=document.documentElement;let t="light";try{t=localStorage.getItem("opp-theme")||"light"}catch(e){}
+  const set=v=>{root.setAttribute("data-theme",v);b.textContent=v==="light"?"Dark mode":"Light mode";try{localStorage.setItem("opp-theme",v)}catch(e){}};set(t);
+  b.onclick=()=>set(root.getAttribute("data-theme")==="light"?"dark":"light")}
+if(FORM_URL){const b=$("#formBtn");b.href=FORM_URL;b.hidden=false}
+frame();render();
+let rz=null,wasNarrow=innerWidth<640;addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{if((innerWidth<640)!==wasNarrow){wasNarrow=innerWidth<640;Object.keys(nodes).forEach(k=>delete nodes[k]);gBub=null;frame();render()}},200)});
+const q=new URLSearchParams(location.search);
+if(q.has("demo")||!(q.get("sheet")||SHEET_ID))demo();else{status("","Connecting to the response sheet…");poll();pollT=setInterval(poll,POLL_MS)}
+})();
+</script>
+</body>
+</html>
