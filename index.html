@@ -81,6 +81,19 @@ aside h2{font-family:"IM Fell English",serif;font-weight:400;font-size:20px;marg
 .quote .meta{font-size:13px;color:var(--ink-soft);font-style:italic}
 .quote.flash{animation:flash 2.5s}@keyframes flash{0%{background:var(--hl)}100%{background:transparent}}
 .feed{max-height:420px;overflow:auto}
+.qa{margin-top:22px;border-top:1px solid var(--rule);padding-top:10px}
+.qa h2{font-family:"IM Fell English",serif;font-weight:400;font-size:22px;margin:0 0 6px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.qa h2 .cnt{font-family:"EB Garamond",serif;font-style:italic;font-size:14.5px;color:var(--ink-soft)}
+.qa .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+.q{border:1px solid var(--rule);border-left:4px solid var(--rule);background:var(--card);padding:12px 14px;margin:0 0 12px}
+.q.flash{animation:flash 2.5s}
+.q .qt{font-size:17px;white-space:pre-line}
+.q .meta{font-size:13px;color:var(--ink-soft);font-style:italic;margin-top:5px;display:flex;gap:4px 12px;flex-wrap:wrap}
+.q .meta a{font-style:normal}
+.q .ups{font-family:"IM Fell English",serif;font-style:normal}
+.q .ans{margin:10px 0 0;padding:8px 12px;background:var(--paper-2);border-left:3px solid var(--served);font-size:16px;white-space:pre-line}
+.q .ans .who{display:block;font-style:italic;color:var(--ink-soft);font-size:13px;margin-bottom:3px;white-space:normal}
+.q .open{font-style:italic;color:var(--under);font-size:14px;margin-top:8px}
 .card{position:fixed;z-index:20;max-width:360px;background:var(--card);border:1px solid var(--ink-soft);padding:10px 12px;box-shadow:0 6px 24px rgba(0,0,0,.18);font-size:15px;display:none}
 .card h3{font-family:"IM Fell English",serif;font-weight:400;margin:0 0 4px;font-size:19px}
 .card .meta{font-size:13px;color:var(--ink-soft);font-style:italic}
@@ -92,11 +105,11 @@ footer{font-size:13px;color:var(--ink-soft);margin-top:14px;font-style:italic}
 <div class="wrap">
 <header>
   <h1>AMA about EDUcore</h1>
-  <p class="sub">Each bubble is a need raised during the r/Ed3 AMA. Higher means more people say it matters; further left means it's poorly served today. Bubble size is how many people raised it. The top-left corner is where EDUcore should build.</p>
+  <p class="sub">Questions and answers are read straight from the r/Ed3 AMA thread, alongside the response form. Each bubble is a need people raised. Higher means more people say it matters; further left means it's poorly served today. Bubble size is how many people raised it. The top-left corner is where EDUcore should build.</p>
 </header>
 <div class="cta">
   <a class="btn" id="formBtn" href="#" target="_blank" rel="noopener" hidden>Add what you need · 2 min</a>
-  <a class="btn ghost" href="https://www.reddit.com/r/Ed3/" target="_blank" rel="noopener">Join the AMA on r/Ed3</a>
+  <a class="btn ghost" id="threadBtn" href="https://www.reddit.com/r/Ed3/" target="_blank" rel="noopener">Ask on the r/Ed3 thread</a>
   <span class="status"><span class="dot" id="dot"></span><span id="statusText">Starting…</span></span>
   <button id="themeBtn" title="Switch light / dark">Dark mode</button>
 </div>
@@ -118,6 +131,11 @@ footer{font-size:13px;color:var(--ink-soft);margin-top:14px;font-style:italic}
       <span><i class="dot" style="background:transparent;border:1.2px dashed var(--ink)"></i>includes Claude-estimated comments</span>
       <span style="font-style:italic">Number = rank in the Opportunity ranking · size = how many people raised it</span>
     </div>
+    <section class="qa" id="qa" hidden>
+      <h2>Questions &amp; answers from the thread <span class="cnt" id="qaCount"></span></h2>
+      <div class="tabs" id="qaTabs"></div>
+      <div id="qaList"><p class="empty">Questions from Reddit will appear here.</p></div>
+    </section>
   </div>
   <aside>
     <section><h2>What to ask the room</h2><div id="prompts"><p class="empty">Prompts appear once a few needs are in.</p></div></section>
@@ -127,20 +145,22 @@ footer{font-size:13px;color:var(--ink-soft);margin-top:14px;font-style:italic}
     <section><h2>Voices</h2><div class="feed" id="feed"></div></section>
   </aside>
 </div>
-<footer>Needs are grouped into themes by keyword, a first pass that can be overridden with a "Theme" column in the sheet. Dashed bubbles include needs Claude pulled from Reddit comments and scored by estimate; solid ones come only from people's own ratings. Method after Ulwick's opportunity scoring (importance vs. satisfaction).</footer>
+<footer>Questions and the host's answers are read from the Reddit thread itself every 30 seconds; the form adds people's own ratings. Needs are grouped into themes by keyword, a first pass that can be overridden with a "Theme" column in the sheet. A Reddit question joins the map once it has importance and served scores in the sheet's Reddit tab (matched by comment link); dashed bubbles include those estimated scores, solid ones come only from people's own ratings. Method after Ulwick's opportunity scoring (importance vs. satisfaction).</footer>
 </div>
 <div class="card" id="card"></div>
 
 <script>
 (()=>{
 "use strict";
-/* ========= SETUP: fill these in once the Form exists ========= */
-const SHEET_ID="";      // response sheet ID (share it "Anyone with the link → Viewer")
+/* ========= SETUP ========= */
+const REDDIT_URL="https://www.reddit.com/r/Ed3/comments/1xnts5c/hi_i_am_brandon_dorman_educore_technical_lead_ask/"; // the AMA thread: questions and answers are read straight from it (override with ?reddit=URL)
+const REDDIT_SNAPSHOT="reddit.json"; // fallback: a saved copy of the thread's .json next to this file, used only if the browser can't reach Reddit
+const SHEET_ID="";      // optional response sheet ID (share it "Anyone with the link → Viewer"); override with ?sheet=ID
 const FORM_TAB="";      // blank = first tab, where Google Forms writes responses
-const REDDIT_TAB="Reddit"; // optional tab of Claude-scored Reddit comments (needs a "source" column)
+const REDDIT_TAB="Reddit"; // optional sheet tab with importance/served scores for Reddit questions: columns need, importance, served, role, theme, source (comment link)
 const FORM_URL="";      // public link to the Google Form (shows the "Add what you need" button)
-const POLL_MS=15000;
-/* ============================================================= */
+const POLL_MS=30000;    // Reddit allows roughly 10 anonymous requests a minute; two is polite
+/* ========================= */
 
 const NS="http://www.w3.org/2000/svg",$=s=>document.querySelector(s);
 function el(t,a={},p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
@@ -160,7 +180,8 @@ const THEMES=[
  ["governance","Versioning & governance",["version","governance","changelog","change log","deprecat","release","steward","breaking change","upgrade"]],
  ["onboarding","Docs, examples & onboarding",["documentation","docs","example","tutorial","onboard","getting started","sample","how to","training"]],
  ["privacy","Privacy, consent & access",["privacy","ferpa","consent","security","access control","identity","permission"]],
- ["reporting","State & federal reporting",["reporting","edfacts","state report","compliance","accountability","sedm","federal"]]
+ ["reporting","State & federal reporting",["reporting","edfacts","state report","compliance","accountability","sedm","federal"]],
+ ["project","Project, roadmap & community",["roadmap","timeline","open source","open-source","license","github","funding","who is behind","contribute","community","adoption","pricing","cost","business model","why educore","what is educore"]]
 ].map(([id,name,kw])=>({id,name,re:kw.map(k=>new RegExp("(^|[^a-z])"+k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+(k.length<=3?"($|[^a-z])":""),"i"))}));
 const tByName=n=>{const l=(n||"").trim().toLowerCase();if(!l)return null;return THEMES.find(t=>t.id===l||t.name.toLowerCase()===l)||THEMES.find(t=>t.name.toLowerCase().includes(l))||null};
 let custom={};
@@ -173,6 +194,7 @@ const STDS=[["Ed-Fi",/ed-?fi/i],["CEDS",/\bceds\b/i],["CASE",/\bcase\b/i],["CTDL
 
 /* ---- state ---- */
 let rows=[],seen=new Set(),first=true,role="",sel=null,pollT=null,demoT=null;
+let threadInfo=null,lastThread=null,redditSrc="",ansSeen=new Map();
 
 /* ---- reading the sheet (JSONP: works from GitHub Pages or a local file) ---- */
 let jn=0;
@@ -185,6 +207,36 @@ function sheetRows(id,tab){return new Promise((res,rej)=>{
   sc.onerror=()=>{done();rej(new Error("couldn't load sheet; is it shared 'Anyone with the link'?"))};
   sc.src=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json;responseHandler:${cb}&headers=1${tab?"&sheet="+encodeURIComponent(tab):""}&_t=${Date.now()}`;
   document.head.appendChild(sc)})}
+
+/* ---- reading the Reddit thread (a plain fetch from the browser; Reddit's .json endpoints answer cross-origin GETs) ---- */
+function threadJsonUrl(u){const b=u.trim().replace(/[?#].*$/,"").replace(/\/+$/,"").replace(/\.json$/,"").replace(/^https?:\/\/([a-z]+\.)?reddit\.com/i,"https://www.reddit.com");return b+".json?limit=500&depth=10&raw_json=1"}
+async function redditThread(u){const r=await fetch(threadJsonUrl(u),{cache:"no-store"});if(!r.ok)throw new Error("Reddit answered "+r.status);return r.json()}
+async function redditSnapshot(){const r=await fetch(REDDIT_SNAPSHOT+"?_t="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error("no saved copy");return r.json()}
+// markdown → plain text, enough for display
+const md=s=>String(s||"").replace(/\r/g,"").replace(/^\s*(&gt;|>)\s?.*$/gm,"").replace(/!\[[^\]]*\]\([^)]*\)/g,"").replace(/\[([^\]]+)\]\([^)]+\)/g,"$1")
+  .replace(/(\*\*|__|~~|`)/g,"").replace(/(^|\s)[*_](\S[^*_\n]*?\S|\S)[*_](?=\s|[.,;:!?)]|$)/g,"$1$2").replace(/^#+\s*/gm,"").replace(/&amp;/g,"&").replace(/[ \t]+\n/g,"\n").replace(/\n{3,}/g,"\n\n").trim();
+const shorten=(s,n=200)=>{const one=s.replace(/\s+/g," ").trim();if(one.length<=n)return one;const cut=one.slice(0,n);const end=Math.max(cut.lastIndexOf(". "),cut.lastIndexOf("? "),cut.lastIndexOf("! "));return(end>n*.45?cut.slice(0,end+1):cut.slice(0,cut.lastIndexOf(" "))+"…").trim()};
+const dead=b=>/^\[(deleted|removed)\]$/.test(b||"");
+function parseThread(data){
+  const post=((((data||[])[0]||{}).data||{}).children||[])[0],p=post?post.data:{},op=p.author||"";let more=0;const qs=[];
+  const opReplies=(node,acc)=>{const ch=node&&node.replies&&node.replies.data?node.replies.data.children:[];
+    ch.forEach(c=>{if(c.kind==="more"){more+=c.data.count||0;return}if(c.kind!=="t1")return;const d=c.data;
+      if((d.is_submitter||d.author===op)&&!dead(d.body))acc.push({body:md(d.body),t:new Date(d.created_utc*1000),link:"https://www.reddit.com"+d.permalink,to:node.author});
+      opReplies(d,acc)});return acc};
+  ((((data||[])[1]||{}).data||{}).children||[]).forEach(c=>{if(c.kind==="more"){more+=c.data.count||0;return}if(c.kind!=="t1")return;const d=c.data;
+    if(d.is_submitter||d.author===op||d.author==="AutoModerator"||(d.stickied&&d.distinguished))return;const body=md(d.body);if(!body||dead(d.body))return;
+    qs.push({id:d.id,author:d.author,flair:(d.author_flair_text||"").trim(),body,ups:d.score==null?0:d.score,t:new Date(d.created_utc*1000),link:"https://www.reddit.com"+d.permalink,answers:opReplies(d,[])})});
+  return{title:p.title||"",op,url:p.permalink?"https://www.reddit.com"+p.permalink:"",questions:qs,more}}
+const commentId=u=>{const m=String(u||"").match(/\/comments\/\w+\/[^/]*\/(\w+)/);return m?m[1]:""};
+// live questions become rows; the sheet's Reddit tab only lends them scores (matched by comment link). Unmatched sheet rows stay as before.
+function normalizeThread(th,scoreTable){
+  const scored=normalize(scoreTable,"reddit");if(!th)return{rows:[],leftover:scored};
+  const byId={};scored.forEach(r=>{const id=commentId(r.link);if(id)byId[id]=r});const used=new Set();
+  const rows=th.questions.map(q=>{const s=byId[q.id];if(s)used.add(s.key);const ans=q.answers.map(a=>a.body).join("\n\n"),need=q.body;
+    return{key:"reddit|"+q.id,src:"reddit",t:q.t,need,short:shorten(need),more:"",imp:s?s.imp:null,sat:s?s.sat:null,est:!!s,
+      role:s&&s.role!=="Unspecified"?s.role:(q.flair||"Reddit"),stds:STDS.filter(([,re])=>re.test(need+" "+ans)).map(([n])=>n),
+      link:q.link,theme:s?s.theme:themeOf(need,""),q}});
+  return{rows,leftover:scored.filter(r=>!used.has(r.key))}}
 function parseTime(s){const m=(s||"").match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+):?(\d+)?/);if(m)return new Date(+m[3],m[1]-1,+m[2],+m[4],+m[5],+(m[6]||0));const d=new Date(s);return isNaN(d)?null:d}
 const score=v=>{const m=String(v||"").match(/[1-5]/);return m?+m[0]:null};
 
@@ -199,16 +251,18 @@ function normalize(table,source){
   return table.slice(1).map((r,i)=>{const need=(r[C.need]||"").trim();if(!need)return null;
     const more=C.more>=0?(r[C.more]||"").trim():"";const stdText=(C.std>=0?r[C.std]:"")+" "+need+" "+more;
     return{key:source+"|"+(r[C.ts]||"")+"|"+i+"|"+need.slice(0,30),src:source,t:parseTime(r[C.ts]),need,more,
-      imp:score(r[C.imp]),sat:score(r[C.sat]),role:C.role>=0?(r[C.role]||"").trim()||"Unspecified":"Unspecified",
+      imp:score(r[C.imp]),sat:score(r[C.sat]),est:source==="reddit",short:"",role:C.role>=0?(r[C.role]||"").trim()||"Unspecified":"Unspecified",
       stds:STDS.filter(([,re])=>re.test(stdText)).map(([n])=>n),link:C.src>=0?(r[C.src]||"").trim():"",
       theme:themeOf(need+" "+more,C.theme>=0?r[C.theme]:"")}}).filter(Boolean)}
 
-function ingest(formTable,redditTable){
-  custom={};const all=[...normalize(formTable,"form"),...normalize(redditTable,"reddit")];
+function ingest(formTable,redditTable,thread){
+  custom={};const th=normalizeThread(thread,redditTable);
+  const all=[...normalize(formTable,"form"),...th.rows,...th.leftover].sort((a,b)=>(a.t?a.t.getTime():0)-(b.t?b.t.getTime():0));
   const fresh=all.filter(r=>!seen.has(r.key));fresh.forEach(r=>seen.add(r.key));
+  const freshAns=new Set();all.forEach(r=>{if(r.q){const n=r.q.answers.length,was=ansSeen.get(r.key);if(!first&&was!=null&&n>was)freshAns.add(r.key);ansSeen.set(r.key,n)}});
   if(first){fresh.length=0;first=false}
   rows=all;fresh.forEach(r=>{if(r.need.length>8)spot.unshift(r)});
-  render(new Set(fresh.map(r=>r.theme)));if(fresh.length){si=0;showSpot()}}
+  render(new Set(fresh.map(r=>r.theme)),freshAns);if(fresh.length){si=0;showSpot()}}
 
 /* ---- aggregation ---- */
 const mean=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
@@ -217,7 +271,7 @@ function agg(list){const by={};list.forEach(r=>{(by[r.theme]=by[r.theme]||[]).pu
     const imp=mean(ims),sat=mean(sts);const i10=imp==null?null:(imp-1)*2.5,s10=sat==null?null:(sat-1)*2.5;
     const opp=i10==null||s10==null?null:i10+Math.max(i10-s10,0);
     const roles={};rs.forEach(r=>roles[r.role]=(roles[r.role]||0)+1);
-    return{id,name:themeName(id),rs,n:rs.length,imp,sat,opp,est:rs.some(r=>r.src==="reddit"),
+    return{id,name:themeName(id),rs,n:rs.length,imp,sat,opp,est:rs.some(r=>r.est),
       spread:ims.length>1?Math.max(...ims)-Math.min(...ims):0,roles}}).filter(g=>g.imp!=null&&g.sat!=null)}
 function quad(g){return g.imp>=3?(g.sat<3?"under":"served"):(g.sat<3?"low":"over")}
 
@@ -281,7 +335,7 @@ function card(e,g){const c=$("#card");c.innerHTML="";
   const h=H("h3");h.textContent=g.name;const m=H("div");m.className="meta";
   m.textContent=`${g.n} ${g.n===1?"person":"people"} · importance ${g.imp.toFixed(1)} · served ${g.sat.toFixed(1)} · score ${g.opp.toFixed(1)}`;c.append(h,m);
   const rl=H("div");rl.className="meta";rl.textContent="Who: "+Object.entries(g.roles).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k} (${v})`).join(", ");c.appendChild(rl);
-  g.rs.slice(-3).reverse().forEach(r=>{const p=H("p");p.textContent="“"+r.need+"”"+(r.src==="reddit"?" (Reddit, Claude-scored)":"");c.appendChild(p)});
+  g.rs.slice(-3).reverse().forEach(r=>{const p=H("p");p.textContent="“"+(r.short||r.need)+"”"+(r.src==="reddit"?" (Reddit)":"");c.appendChild(p)});
   c.style.display="block";place(e)}
 function place(e){const c=$("#card");if(c.style.display!=="block")return;const x=Math.min((e.clientX||innerWidth/2)+16,innerWidth-c.offsetWidth-10),y=Math.min((e.clientY||innerHeight/2)+16,innerHeight-c.offsetHeight-10);c.style.left=Math.max(8,x)+"px";c.style.top=Math.max(8,y)+"px"}
 function hide(){$("#card").style.display="none"}
@@ -300,7 +354,9 @@ function renderRank(groups){const box=$("#rank");box.innerHTML="";
     const n=H("span");n.className="n";n.textContent=i+1;const a=H("span");a.textContent=g.name;const s=H("span");s.textContent=g.opp.toFixed(1);
     const bar=H("div");bar.className="bar";const b=H("i");b.style.width=(g.opp/20*100)+"%";bar.appendChild(b);
     const m=H("div");m.className="meta";m.textContent=`${g.n} · matters ${g.imp.toFixed(1)} · served ${g.sat.toFixed(1)}${g.est?" · incl. Reddit estimates":""}`;
-    d.append(n,a,s,bar,m);d.onclick=()=>{sel=sel===g.id?null:g.id;render();refreshSpot()};d.onkeydown=e=>{if(e.key==="Enter")d.onclick()};box.appendChild(d)})}
+    d.append(n,a,s,bar,m);d.onclick=()=>{sel=sel===g.id?null:g.id;render();refreshSpot()};d.onkeydown=e=>{if(e.key==="Enter")d.onclick()};box.appendChild(d)});
+  const un=rows.filter(r=>r.q&&r.imp==null).length;
+  if(un){const p=H("p");p.className="empty";p.style.marginTop="8px";p.textContent=`${un} Reddit question${un===1?" isn't":"s aren't"} on the map yet: add importance and served scores in the sheet's "${REDDIT_TAB}" tab, keyed by comment link.`;box.appendChild(p)}}
 function renderStds(list){const box=$("#stds");box.innerHTML="";const c={};list.forEach(r=>r.stds.forEach(s=>c[s]=(c[s]||0)+1));
   const e=Object.entries(c).sort((a,b)=>b[1]-a[1]);if(!e.length){box.innerHTML='<p class="empty">None yet.</p>';return}const mx=e[0][1];
   e.forEach(([k,v])=>{const d=H("div");d.className="std";const a=H("span");a.textContent=k;const b=H("span");b.className="b";const i=H("i");i.style.width=(v/mx*100)+"%";b.appendChild(i);const n=H("span");n.textContent=v;d.append(a,b,n);box.appendChild(d)})}
@@ -309,11 +365,42 @@ function renderFeed(list,fresh){const box=$("#feed");box.innerHTML="";let l=list
   if(!l.length){const p=H("p");p.className="empty";p.textContent="No needs yet.";box.appendChild(p);return}
   l.slice(0,100).forEach(r=>{const d=H("div");d.className="quote"+(fresh&&fresh.has(r.theme)&&!seenFeed.has(r.key)?" flash":"");seenFeed.add(r.key);
     d.style.borderLeftColor=`var(--${(()=>{const g=agg([r])[0];return g?quad(g):"low"})()})`;
-    const t=H("div");t.textContent=r.need+(r.more?" — "+r.more:"");const m=H("div");m.className="meta";
-    m.textContent=`${r.role} · ${themeName(r.theme)}${r.imp?` · matters ${r.imp}/5, served ${r.sat}/5`:""}${r.src==="reddit"?" · Reddit, Claude-scored":""}`;
+    const t=H("div");t.textContent=(r.short||r.need)+(r.more?" — "+r.more:"");const m=H("div");m.className="meta";
+    m.textContent=`${whoIs(r)} · ${themeName(r.theme)}${r.imp?` · matters ${r.imp}/5, served ${r.sat}/5`:""}${r.src==="reddit"?" · Reddit"+(r.est?", estimated scores":""):""}${r.q?(r.q.answers.length?" · answered":" · waiting for an answer"):""}`;
     d.append(t,m);if(r.link&&/^https:\/\/(www\.|old\.)?reddit\.com\//.test(r.link)){const a=H("a");a.href=r.link;a.target="_blank";a.rel="noopener";a.textContent=" ↗ comment";a.style.fontSize="13px";m.appendChild(a)}
     box.appendChild(d)})}
 let seenFeed=new Set();
+const whoIs=r=>r.q?"u/"+r.q.author+(r.role!=="Reddit"?" · "+r.role:""):r.role;
+
+/* ---- questions & answers from the thread ---- */
+let qaFilter="all",seenQA=new Set();
+function renderQA(list,fresh,freshAns){const sec=$("#qa"),box=$("#qaList"),tabs=$("#qaTabs"),cnt=$("#qaCount");
+  let qs=list.filter(r=>r.q);const total=qs.length;sec.hidden=!threadInfo;
+  if(!total){box.innerHTML='<p class="empty">No questions on the thread yet.</p>';tabs.innerHTML="";cnt.textContent="";return}
+  const answered=qs.filter(r=>r.q.answers.length).length;
+  cnt.textContent=`${total} question${total===1?"":"s"} · ${answered} answered${threadInfo&&threadInfo.more?` · ${threadInfo.more} more collapsed on Reddit`:""}`;
+  tabs.innerHTML="";[["all","All"],["open","Waiting for an answer"],["answered","Answered"]].forEach(([k,l])=>{const b=H("button");b.textContent=l;b.setAttribute("aria-pressed",qaFilter===k);b.onclick=()=>{qaFilter=k;render()};tabs.appendChild(b)});
+  if(sel)qs=qs.filter(r=>r.theme===sel);
+  if(qaFilter==="open")qs=qs.filter(r=>!r.q.answers.length);if(qaFilter==="answered")qs=qs.filter(r=>r.q.answers.length);
+  qs.sort((a,b)=>(b.q.ups-a.q.ups)||(b.t-a.t));
+  box.innerHTML="";if(sel){const p=H("p");p.className="empty";p.textContent=`Showing “${themeName(sel)}”. Click the bubble again to clear.`;box.appendChild(p)}
+  if(!qs.length){const p=H("p");p.className="empty";p.textContent="Nothing here yet.";box.appendChild(p);return}
+  qs.forEach(r=>{const q=r.q,d=H("article");
+    d.className="q"+((fresh&&fresh.has(r.theme)&&!seenQA.has(r.key))||(freshAns&&freshAns.has(r.key))?" flash":"");seenQA.add(r.key);
+    const g=r.imp!=null&&r.sat!=null?agg([r])[0]:null;d.style.borderLeftColor=g?`var(--${quad(g)})`:"var(--rule)";
+    const t=H("div");t.className="qt";t.textContent=q.body;
+    const m=H("div");m.className="meta";
+    const who=H("span");who.textContent=`u/${q.author}${q.flair?" · "+q.flair:""}`;
+    const up=H("span");up.className="ups";up.textContent=`▲ ${q.ups}`;
+    const th=H("span");th.textContent=themeName(r.theme);
+    const sc=H("span");sc.textContent=r.imp!=null?`matters ${r.imp}/5, served ${r.sat}/5`:"not yet scored";
+    const a=H("a");a.href=q.link;a.target="_blank";a.rel="noopener";a.textContent="open on Reddit ↗";
+    m.append(who,up,th,sc,a);d.append(t,m);
+    if(q.answers.length)q.answers.forEach(an=>{const b=H("div");b.className="ans";const w=H("span");w.className="who";
+      w.textContent=`${threadInfo&&threadInfo.op?"u/"+threadInfo.op:"Host"} answered${an.to&&an.to!==q.author?" (to u/"+an.to+")":""} · ${an.t.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}`;
+      b.appendChild(w);b.appendChild(document.createTextNode(an.body));d.appendChild(b)});
+    else{const o=H("div");o.className="open";o.textContent="Waiting for an answer";d.appendChild(o)}
+    box.appendChild(d)})}
 
 /* ---- discussion prompts (rule-based) ---- */
 function renderPrompts(groups,list){const box=$("#prompts");box.innerHTML="";
@@ -339,22 +426,31 @@ let spot=[],si=0,paused=false,spT=null;
 function refreshSpot(){spot=filtered().filter(r=>r.need.length>8&&(!sel||r.theme===sel)).reverse();si=0;showSpot()}
 function showSpot(){const q=$("#spotQ");clearTimeout(spT);if(!spot.length){q.innerHTML='<span class="empty">Needs from the AMA will appear here.</span>';return}
   si=((si%spot.length)+spot.length)%spot.length;const r=spot[si];q.style.opacity=0;
-  setTimeout(()=>{q.innerHTML="";q.appendChild(document.createTextNode("“"+r.need+"”"));const w=H("span");w.className="who";
-    w.textContent=`${r.role} · ${themeName(r.theme)}${r.src==="reddit"?" · from a Reddit comment":""}`;q.appendChild(w);q.style.opacity=1},250);
+  setTimeout(()=>{q.innerHTML="";q.appendChild(document.createTextNode("“"+(r.short||r.need)+"”"));const w=H("span");w.className="who";
+    w.textContent=`${whoIs(r)} · ${themeName(r.theme)}${r.src==="reddit"?" · from the Reddit thread":""}${r.q?(r.q.answers.length?" · answered":" · waiting for an answer"):""}`;q.appendChild(w);q.style.opacity=1},250);
   if(!paused)spT=setTimeout(()=>{si++;showSpot()},9000)}
 $("#spPrev").onclick=()=>{si--;showSpot()};$("#spNext").onclick=()=>{si++;showSpot()};
 $("#spPause").onclick=e=>{paused=!paused;e.currentTarget.setAttribute("aria-pressed",paused);e.currentTarget.textContent=paused?"▶":"❚❚";showSpot()};
 
-function render(fresh){const list=filtered(),groups=agg(list);renderRoles();renderMap(groups,fresh);renderRank(groups);renderStds(list);renderFeed(list,fresh);renderPrompts(groups,list)}
+function render(fresh,freshAns){const list=filtered(),groups=agg(list);renderRoles();renderMap(groups,fresh);renderRank(groups);renderStds(list);renderFeed(list,fresh);renderQA(list,fresh,freshAns);renderPrompts(groups,list)}
 
 /* ---- status & polling ---- */
 function status(k,m){$("#dot").className="dot "+k;const s=$("#statusText");s.innerHTML="";if(k==="demo"){const b=H("span");b.className="badge";b.textContent="SAMPLE DATA";s.append(b," ")}s.append(document.createTextNode(m))}
+function statusLine(){const rq=rows.filter(r=>r.q),ans=rq.filter(r=>r.q.answers.length).length,fm=rows.filter(r=>r.src==="form").length,parts=[];
+  if(threadInfo)parts.push(`${rq.length} question${rq.length===1?"":"s"} from Reddit${redditSrc==="snapshot"?" (saved copy)":""}, ${ans} answered`);
+  if(fm)parts.push(`${fm} form response${fm===1?"":"s"}`);return parts.join(" · ")}
 async function poll(){
-  const id=new URLSearchParams(location.search).get("sheet")||SHEET_ID;
-  try{const f=await sheetRows(id,FORM_TAB);let rd=null;if(REDDIT_TAB){try{rd=await sheetRows(id,REDDIT_TAB)}catch(e){}}
-    const wasFirst=first;ingest(f,rd);if(wasFirst)refreshSpot();
-    status("live",`Live · ${rows.length} need${rows.length===1?"":"s"} · updated ${new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit",second:"2-digit"})}`)}
-  catch(e){if(!rows.length){clearInterval(pollT);demo(e.message)}else status("",`Reconnecting… (${e.message})`)}}
+  const qp=new URLSearchParams(location.search),id=qp.get("sheet")||SHEET_ID,ru=qp.get("reddit")||REDDIT_URL;
+  let f=null,rd=null,th=null;const errs=[];
+  if(ru){try{th=parseThread(await redditThread(ru));redditSrc="live"}
+    catch(e){try{th=parseThread(await redditSnapshot());redditSrc="snapshot";errs.push(`Reddit: ${e.message}; showing the saved copy`)}
+      catch(e2){errs.push("Reddit: "+e.message+(lastThread?"; showing the last read":""));th=lastThread}}}
+  if(id){try{f=await sheetRows(id,FORM_TAB)}catch(e){errs.push("Sheet: "+e.message)}
+    if(REDDIT_TAB){try{rd=await sheetRows(id,REDDIT_TAB)}catch(e){}}}
+  if(!th&&!f){if(!rows.length){clearInterval(pollT);demo(errs.join("; "))}else status("",`Reconnecting… (${errs.join("; ")})`);return}
+  if(th){threadInfo=th;lastThread=th;if(th.url)$("#threadBtn").href=th.url}
+  const wasFirst=first;ingest(f,rd,th);if(wasFirst)refreshSpot();
+  status("live",`Live · ${statusLine()} · updated ${new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit",second:"2-digit"})}${errs.length?" · "+errs.join("; "):""}`)}
 
 /* ---- sample data (no sheet yet, or ?demo) ---- */
 const DH=["Timestamp","What do you need EDUcore to do?","How important is this to you?","How well is it handled today, by any tool or standard?","Which best describes you?","Which standards does it touch?","Anything else?"];
@@ -387,17 +483,18 @@ function demo(why){clearTimeout(demoT);let i=6,j=1;const base=Date.now()-12*6000
   const fmt=t=>`${t.getMonth()+1}/${t.getDate()}/${t.getFullYear()} ${t.getHours()}:${t.getMinutes()}:00`;
   const tab=k=>[DH,...DEMO.slice(0,k).map((d,n)=>[fmt(new Date(base+n*45000)),...d])];
   seen=new Set();first=true;ingest(tab(i),DR.slice(0,1+j));refreshSpot();
-  status("demo",why&&SHEET_ID?`Couldn't read the sheet (${why}). Showing sample needs.`:"Showing sample needs until the Form is connected");
+  status("demo",why&&(SHEET_ID||REDDIT_URL)?`Couldn't reach the live sources (${why}). Showing sample needs.`:"Showing sample needs until a thread or Form is connected");
   const step=()=>{if(i>=DEMO.length&&j>=DR.length-1)return;if(i<DEMO.length)i++;else j++;ingest(tab(i),DR.slice(0,1+j));demoT=setTimeout(step,5000)};demoT=setTimeout(step,4000)}
 
 {const b=$("#themeBtn"),root=document.documentElement;let t="light";try{t=localStorage.getItem("opp-theme")||"light"}catch(e){}
   const set=v=>{root.setAttribute("data-theme",v);b.textContent=v==="light"?"Dark mode":"Light mode";try{localStorage.setItem("opp-theme",v)}catch(e){}};set(t);
   b.onclick=()=>set(root.getAttribute("data-theme")==="light"?"dark":"light")}
 if(FORM_URL){const b=$("#formBtn");b.href=FORM_URL;b.hidden=false}
+if(REDDIT_URL)$("#threadBtn").href=REDDIT_URL;
 frame();render();
 let rz=null,wasNarrow=innerWidth<640;addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{if((innerWidth<640)!==wasNarrow){wasNarrow=innerWidth<640;Object.keys(nodes).forEach(k=>delete nodes[k]);gBub=null;frame();render()}},200)});
 const q=new URLSearchParams(location.search);
-if(q.has("demo")||!(q.get("sheet")||SHEET_ID))demo();else{status("","Connecting to the response sheet…");poll();pollT=setInterval(poll,POLL_MS)}
+if(q.has("demo")||!(q.get("sheet")||SHEET_ID||q.get("reddit")||REDDIT_URL))demo();else{status("","Reading the Reddit thread…");poll();pollT=setInterval(poll,POLL_MS)}
 })();
 </script>
 </body>
